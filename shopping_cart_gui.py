@@ -4,6 +4,7 @@ Shopping Cart GUI - MVP
 """
 
 import tkinter as tk
+from dict_methods import add_item
 
 
 class ShoppingCartGUI:
@@ -19,6 +20,9 @@ class ShoppingCartGUI:
         self.root.title("Shopping Cart Manager - MVP")
         self.root.geometry("600x500")
         self.root.resizable(False, False)
+
+        # Initialises cart
+        self.cart = {}
 
         # Sets up UI
         self.setup_ui()
@@ -64,11 +68,48 @@ class ShoppingCartGUI:
         )
         add_btn.grid(row=0, column=2, padx=10, pady=5)
 
+        # Current Cart Section
+        cart_frame = tk.LabelFrame(
+            self.root,
+            text="Current Cart",
+            padx=20,
+            pady=20,
+            font=("Arial", 10, "bold")
+        )
+        cart_frame.pack(padx=20, pady=10, fill="both", expand=True)
+
+        # Cart display
+        self.cart_display = tk.Text(
+            cart_frame,
+            height=10,
+            width=50,
+            font=("Arial", 10),
+            state="disabled"
+        )
+        self.cart_display.pack(pady=5)
+
     def add_item_to_cart(self):
-        """place holder for Adding item to cart """
+        """Adds item to cart using add_item() function from dict_methods."""
         item_name = self.item_entry.get().strip()
-        print(f"Would add: {item_name}")
+
+        if not item_name:
+            return
+
+        # Updates cart and refreshes UI after user adds item
+        self.cart = add_item(self.cart, [item_name])
         self.item_entry.delete(0, tk.END)
+        self.update_cart_display()
+
+    def update_cart_display(self):
+        """Updates cart display."""
+        self.cart_display.config(state="normal")
+        self.cart_display.delete("1.0", tk.END)
+
+        if not self.cart:
+            self.cart_display.insert(tk.END, "Cart is empty\n")
+        else:
+            for item, quantity in self.cart.items():
+                self.cart_display.insert(tk.END, f"{item}: {quantity}\n")
 
 
 def main():
