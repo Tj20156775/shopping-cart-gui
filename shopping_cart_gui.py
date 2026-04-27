@@ -1,14 +1,13 @@
-#!/usr/bin/env python3
 """
 Shopping Cart GUI - MVP
 """
 
 import tkinter as tk
-from dict_methods import add_item
+from dict_methods import add_item, sort_entries
 
 
 class ShoppingCartGUI:
-    """GUI for managing shopping cart."""
+    """ GUI for managing shopping cart."""
 
     def __init__(self, root):
         """Initialises GUI.
@@ -88,20 +87,66 @@ class ShoppingCartGUI:
         )
         self.cart_display.pack(pady=5)
 
+        # Buttons Frame
+        buttons_frame = tk.Frame(cart_frame)
+        buttons_frame.pack(pady=10)
+
+        # Sort button
+        sort_btn = tk.Button(
+            buttons_frame,
+            text="Sort Cart (A-Z)",
+            command=self.sort_cart,
+            bg="white",
+            fg="orange",
+            font=("Arial", 10, "bold"),
+            padx=20,
+            pady=5
+        )
+        sort_btn.pack(side="left", padx=5)
+
+        # Clear button
+        clear_btn = tk.Button(
+            buttons_frame,
+            text="Clear Cart",
+            command=self.clear_cart,
+            bg="white",
+            fg="red",
+            font=("Arial", 10, "bold"),
+            padx=20,
+            pady=5
+        )
+        clear_btn.pack(side="left", padx=5)
+
+        # Total Items Label
+        self.total_label = tk.Label(
+            self.root,
+            text="Total Items: 0",
+            font=("Arial", 30, "bold"),
+            pady=10
+        )
+        self.total_label.pack()
+
     def add_item_to_cart(self):
         """Adds item to cart using add_item() function from dict_methods."""
         item_name = self.item_entry.get().strip()
-
-        if not item_name:
-            return
 
         # Updates cart and refreshes UI after user adds item
         self.cart = add_item(self.cart, [item_name])
         self.item_entry.delete(0, tk.END)
         self.update_cart_display()
 
+    def sort_cart(self):
+        """Sorts cart alphabetically using sort_entries() function."""
+        self.cart = sort_entries(self.cart)
+        self.update_cart_display()
+
+    def clear_cart(self):
+        """Clears all items from cart."""
+        self.cart = {}
+        self.update_cart_display()
+
     def update_cart_display(self):
-        """Updates cart display."""
+        """Updates cart display and total items count."""
         self.cart_display.config(state="normal")
         self.cart_display.delete("1.0", tk.END)
 
@@ -111,9 +156,12 @@ class ShoppingCartGUI:
             for item, quantity in self.cart.items():
                 self.cart_display.insert(tk.END, f"{item}: {quantity}\n")
 
+        total_items = sum(self.cart.values())
+        self.total_label.config(text=f"Total Items: {total_items}")
+
 
 def main():
-    """Runs app"""
+    """runs app"""
     root = tk.Tk()
     ShoppingCartGUI(root)
     root.mainloop()
